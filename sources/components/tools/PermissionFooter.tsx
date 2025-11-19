@@ -152,8 +152,9 @@ export const PermissionFooter: React.FC<PermissionFooterProps> = ({ permission, 
     };
 
     // Detect which button was used based on mode (for Claude) or decision (for Codex)
-    const isApprovedViaAllow = isApproved && permission.mode !== 'acceptEdits' && !isToolAllowed(toolName, toolInput, permission.allowedTools);
-    const isApprovedViaAllEdits = isApproved && permission.mode === 'acceptEdits';
+    const isAutoApproveEdits = permission.mode === 'acceptEdits' || permission.mode === 'auto_edit';
+    const isApprovedViaAllow = isApproved && !isAutoApproveEdits && !isToolAllowed(toolName, toolInput, permission.allowedTools);
+    const isApprovedViaAllEdits = isApproved && isAutoApproveEdits;
     const isApprovedForSession = isApproved && isToolAllowed(toolName, toolInput, permission.allowedTools);
     
     // Codex-specific status detection with fallback

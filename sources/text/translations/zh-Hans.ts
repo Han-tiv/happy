@@ -391,6 +391,7 @@ export const zhHans: TranslationStructure = {
         agent: {
             claude: 'Claude',
             codex: 'Codex',
+            gemini: 'Gemini',
         },
         model: {
             title: '模型',
@@ -409,6 +410,14 @@ export const zhHans: TranslationStructure = {
             badgeSafeYolo: 'Safe YOLO',
             badgeYolo: 'YOLO',
         },
+        geminiPermissionMode: {
+            title: 'Gemini 权限模式',
+            default: '默认(请求批准)',
+            autoEdit: '自动编辑(自动批准编辑工具)',
+            yolo: 'YOLO(自动批准所有工具)',
+            badgeAutoEdit: '自动编辑(自动批准编辑工具)',
+            badgeYolo: 'YOLO(自动批准所有工具)',
+        },
         codexModel: {
             title: 'CODEX 模型',
             gpt5CodexLow: 'gpt-5-codex low',
@@ -418,6 +427,13 @@ export const zhHans: TranslationStructure = {
             gpt5Low: 'GPT-5 低',
             gpt5Medium: 'GPT-5 中',
             gpt5High: 'GPT-5 高',
+        },
+        geminiModel: {
+            title: 'GEMINI 模型',
+            default: 'Gemini CLI 默认',
+            flash: 'gemini-2.0-flash',
+            flashThinking: 'gemini-2.0-flash-thinking',
+            pro: 'gemini-2.0-pro',
         },
         context: {
             remaining: ({ percent }: { percent: number }) => `剩余 ${percent}%`,

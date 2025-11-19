@@ -212,13 +212,13 @@ function NewSessionScreen() {
     // Agent selection
     //
 
-    const [agentType, setAgentType] = React.useState<'claude' | 'codex'>(() => {
+    const [agentType, setAgentType] = React.useState<'claude' | 'codex' | 'gemini'>(() => {
         // Check if agent type was provided in temp data
         if (tempSessionData?.agentType) {
             return tempSessionData.agentType;
         }
         // Initialize with last used agent if valid, otherwise default to 'claude'
-        if (lastUsedAgent === 'claude' || lastUsedAgent === 'codex') {
+        if (lastUsedAgent === 'claude' || lastUsedAgent === 'codex' || lastUsedAgent === 'gemini') {
             return lastUsedAgent;
         }
         return 'claude';
@@ -241,11 +241,14 @@ function NewSessionScreen() {
         // Initialize with last used permission mode if valid, otherwise default to 'default'
         const validClaudeModes: PermissionMode[] = ['default', 'acceptEdits', 'plan', 'bypassPermissions'];
         const validCodexModes: PermissionMode[] = ['default', 'read-only', 'safe-yolo', 'yolo'];
+        const validGeminiModes: PermissionMode[] = ['default', 'auto_edit', 'yolo'];
 
         if (lastUsedPermissionMode) {
             if (agentType === 'codex' && validCodexModes.includes(lastUsedPermissionMode as PermissionMode)) {
                 return lastUsedPermissionMode as PermissionMode;
             } else if (agentType === 'claude' && validClaudeModes.includes(lastUsedPermissionMode as PermissionMode)) {
+                return lastUsedPermissionMode as PermissionMode;
+            } else if (agentType === 'gemini' && validGeminiModes.includes(lastUsedPermissionMode as PermissionMode)) {
                 return lastUsedPermissionMode as PermissionMode;
             }
         }
@@ -256,11 +259,14 @@ function NewSessionScreen() {
         // Initialize with last used model mode if valid, otherwise default
         const validClaudeModes: ModelMode[] = ['default', 'adaptiveUsage', 'sonnet', 'opus'];
         const validCodexModes: ModelMode[] = ['gpt-5-codex-high', 'gpt-5-codex-medium', 'gpt-5-codex-low', 'default', 'gpt-5-minimal', 'gpt-5-low', 'gpt-5-medium', 'gpt-5-high'];
+        const validGeminiModes: ModelMode[] = ['default', 'gemini-2.0-flash', 'gemini-2.0-flash-thinking', 'gemini-2.0-pro'];
 
         if (lastUsedModelMode) {
             if (agentType === 'codex' && validCodexModes.includes(lastUsedModelMode as ModelMode)) {
                 return lastUsedModelMode as ModelMode;
             } else if (agentType === 'claude' && validClaudeModes.includes(lastUsedModelMode as ModelMode)) {
+                return lastUsedModelMode as ModelMode;
+            } else if (agentType === 'gemini' && validGeminiModes.includes(lastUsedModelMode as ModelMode)) {
                 return lastUsedModelMode as ModelMode;
             }
         }
@@ -269,15 +275,8 @@ function NewSessionScreen() {
 
     // Reset permission and model modes when agent type changes
     React.useEffect(() => {
-        if (agentType === 'codex') {
-            // Switch to codex-compatible modes
-            setPermissionMode('default');
-            setModelMode('gpt-5-codex-high');
-        } else {
-            // Switch to claude-compatible modes
-            setPermissionMode('default');
-            setModelMode('default');
-        }
+        setPermissionMode('default');
+        setModelMode(agentType === 'codex' ? 'gpt-5-codex-high' : 'default');
     }, [agentType]);
 
     const handlePermissionModeChange = React.useCallback((mode: PermissionMode) => {
@@ -366,12 +365,13 @@ function NewSessionScreen() {
             const updatedPaths = updateRecentMachinePaths(recentMachinePaths, selectedMachineId, selectedPath);
             sync.applySettings({ recentMachinePaths: updatedPaths });
 
+            const spawnAgent: 'claude' | 'codex' = agentType === 'codex' ? 'codex' : 'claude';
             const result = await machineSpawnNewSession({
                 machineId: selectedMachineId,
                 directory: actualPath,
                 // For now we assume you already have a path to start in
                 approvedNewDirectoryCreation: true,
-                agent: agentType
+                agent: spawnAgent
             });
 
             // Use sessionId to check for success for backwards compatibility

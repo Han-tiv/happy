@@ -389,6 +389,7 @@ export const es: TranslationStructure = {
         agent: {
             claude: 'Claude',
             codex: 'Codex',
+            gemini: 'Gemini',
         },
         model: {
             title: 'MODELO',
@@ -407,6 +408,14 @@ export const es: TranslationStructure = {
             badgeSafeYolo: 'Safe YOLO',
             badgeYolo: 'YOLO',
         },
+        geminiPermissionMode: {
+            title: 'MODO DE PERMISOS GEMINI',
+            default: 'Default (Prompt for approval)',
+            autoEdit: 'Auto Edit (Auto-approve edit tools)',
+            yolo: 'YOLO (Auto-approve all tools)',
+            badgeAutoEdit: 'Auto Edit (Auto-approve edit tools)',
+            badgeYolo: 'YOLO (Auto-approve all tools)',
+        },
         codexModel: {
             title: 'MODELO CODEX',
             gpt5CodexLow: 'gpt-5-codex low',
@@ -416,6 +425,13 @@ export const es: TranslationStructure = {
             gpt5Low: 'GPT-5 Bajo',
             gpt5Medium: 'GPT-5 Medio',
             gpt5High: 'GPT-5 Alto',
+        },
+        geminiModel: {
+            title: 'MODELO GEMINI',
+            default: 'Gemini CLI default',
+            flash: 'gemini-2.0-flash',
+            flashThinking: 'gemini-2.0-flash-thinking',
+            pro: 'gemini-2.0-pro',
         },
         context: {
             remaining: ({ percent }: { percent: number }) => `${percent}% restante`,

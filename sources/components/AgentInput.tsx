@@ -56,7 +56,7 @@ interface AgentInputProps {
     };
     alwaysShowContextSize?: boolean;
     onFileViewerPress?: () => void;
-    agentType?: 'claude' | 'codex';
+    agentType?: 'claude' | 'codex' | 'gemini';
     onAgentClick?: () => void;
     machineName?: string | null;
     onMachineClick?: () => void;
@@ -291,8 +291,11 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
 
     const hasText = props.value.trim().length > 0;
     
-    // Check if this is a Codex session
-    const isCodex = props.metadata?.flavor === 'codex';
+    // Detect active flavor
+    const rawFlavor = props.metadata?.flavor || props.agentType || 'claude';
+    const normalizedFlavor = typeof rawFlavor === 'string' ? rawFlavor.toLowerCase() : 'claude';
+    const isCodex = normalizedFlavor === 'codex' || normalizedFlavor === 'gpt' || normalizedFlavor === 'openai';
+    const isGemini = normalizedFlavor === 'gemini';
 
     // Calculate context warning
     const contextWarning = props.usageData?.contextSize
@@ -454,7 +457,9 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
             if (event.key === 'Tab' && event.shiftKey && props.onPermissionModeChange) {
                 const modeOrder: PermissionMode[] = isCodex
                     ? ['default', 'read-only', 'safe-yolo', 'yolo']
-                    : ['default', 'acceptEdits', 'plan', 'bypassPermissions'];
+                    : isGemini
+                        ? ['default', 'auto_edit', 'yolo']
+                        : ['default', 'acceptEdits', 'plan', 'bypassPermissions'];
                 const currentIndex = modeOrder.indexOf(props.permissionMode || 'default');
                 const nextIndex = (currentIndex + 1) % modeOrder.length;
                 props.onPermissionModeChange(modeOrder[nextIndex]);
@@ -476,7 +481,9 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                 e.preventDefault();
                 const modelOrder: ModelMode[] = isCodex
                     ? ['gpt-5-codex-high', 'gpt-5-codex-medium', 'gpt-5-codex-low', 'default']
-                    : ['default', 'adaptiveUsage', 'sonnet', 'opus'];
+                    : isGemini
+                        ? ['default', 'gemini-2.0-flash', 'gemini-2.0-flash-thinking', 'gemini-2.0-pro']
+                        : ['default', 'adaptiveUsage', 'sonnet', 'opus'];
                 const currentIndex = modelOrder.indexOf(props.modelMode || (isCodex ? 'gpt-5-codex-high' : 'default'));
                 const nextIndex = (currentIndex + 1) % modelOrder.length;
                 props.onModelModeChange(modelOrder[nextIndex]);
@@ -533,17 +540,27 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                                 {/* Permission Mode Section */}
                                 <View style={styles.overlaySection}>
                                     <Text style={styles.overlaySectionTitle}>
-                                        {isCodex ? t('agentInput.codexPermissionMode.title') : t('agentInput.permissionMode.title')}
+                                        {isCodex
+                                            ? t('agentInput.codexPermissionMode.title')
+                                            : isGemini
+                                                ? t('agentInput.geminiPermissionMode.title')
+                                                : t('agentInput.permissionMode.title')}
                                     </Text>
-                                    {(isCodex 
+                                    {(isCodex
                                         ? (['default', 'read-only', 'safe-yolo', 'yolo'] as const)
-                                        : (['default', 'acceptEdits', 'plan', 'bypassPermissions'] as const)
+                                        : isGemini
+                                            ? (['default', 'auto_edit', 'yolo'] as const)
+                                            : (['default', 'acceptEdits', 'plan', 'bypassPermissions'] as const)
                                     ).map((mode) => {
                                         const modeConfig = isCodex ? {
-                                            'default': { label: t('agentInput.codexPermissionMode.default') },
+                                            default: { label: t('agentInput.codexPermissionMode.default') },
                                             'read-only': { label: t('agentInput.codexPermissionMode.readOnly') },
                                             'safe-yolo': { label: t('agentInput.codexPermissionMode.safeYolo') },
-                                            'yolo': { label: t('agentInput.codexPermissionMode.yolo') },
+                                            yolo: { label: t('agentInput.codexPermissionMode.yolo') },
+                                        } : isGemini ? {
+                                            default: { label: t('agentInput.geminiPermissionMode.default') },
+                                            auto_edit: { label: t('agentInput.geminiPermissionMode.autoEdit') },
+                                            yolo: { label: t('agentInput.geminiPermissionMode.yolo') },
                                         } : {
                                             default: { label: t('agentInput.permissionMode.default') },
                                             acceptEdits: { label: t('agentInput.permissionMode.acceptEdits') },
@@ -614,21 +631,32 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                                         paddingBottom: 4,
                                         ...Typography.default('semiBold')
                                     }}>
-                                        {isCodex ? t('agentInput.codexModel.title') : t('agentInput.model.title')}
+                                        {isCodex
+                                            ? t('agentInput.codexModel.title')
+                                            : isGemini
+                                                ? t('agentInput.geminiModel.title')
+                                                : t('agentInput.model.title')}
                                     </Text>
-                                    {(isCodex 
+                                    {(isCodex
                                         ? (['gpt-5-codex-high', 'gpt-5-codex-medium', 'gpt-5-codex-low', 'default', 'gpt-5-minimal', 'gpt-5-low', 'gpt-5-medium', 'gpt-5-high'] as const)
-                                        : (['default', 'adaptiveUsage', 'sonnet', 'opus'] as const)
+                                        : isGemini
+                                            ? (['default', 'gemini-2.0-flash', 'gemini-2.0-flash-thinking', 'gemini-2.0-pro'] as const)
+                                            : (['default', 'adaptiveUsage', 'sonnet', 'opus'] as const)
                                     ).map((model) => {
                                         const modelConfig = isCodex ? {
                                             'gpt-5-codex-high': { label: t('agentInput.codexModel.gpt5CodexHigh') },
                                             'gpt-5-codex-medium': { label: t('agentInput.codexModel.gpt5CodexMedium') },
                                             'gpt-5-codex-low': { label: t('agentInput.codexModel.gpt5CodexLow') },
-                                            'default': { label: t('agentInput.model.default') },
+                                            default: { label: t('agentInput.model.default') },
                                             'gpt-5-minimal': { label: t('agentInput.codexModel.gpt5Minimal') },
                                             'gpt-5-low': { label: t('agentInput.codexModel.gpt5Low') },
                                             'gpt-5-medium': { label: t('agentInput.codexModel.gpt5Medium') },
                                             'gpt-5-high': { label: t('agentInput.codexModel.gpt5High') },
+                                        } : isGemini ? {
+                                            default: { label: t('agentInput.geminiModel.default') },
+                                            'gemini-2.0-flash': { label: t('agentInput.geminiModel.flash') },
+                                            'gemini-2.0-flash-thinking': { label: t('agentInput.geminiModel.flashThinking') },
+                                            'gemini-2.0-pro': { label: t('agentInput.geminiModel.pro') },
                                         } : {
                                             default: { label: t('agentInput.model.default') },
                                             adaptiveUsage: { label: t('agentInput.model.adaptiveUsage') },
@@ -637,7 +665,8 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                                         };
                                         const config = modelConfig[model as keyof typeof modelConfig];
                                         if (!config) return null;
-                                        const isSelected = props.modelMode === model || (isCodex && model === 'gpt-5-codex-high' && !props.modelMode) || (!isCodex && model === 'default' && !props.modelMode);
+                                        const fallbackModel: ModelMode = isCodex ? 'gpt-5-codex-high' : 'default';
+                                        const isSelected = props.modelMode === model || (!props.modelMode && model === fallbackModel);
 
                                         return (
                                             <Pressable
@@ -733,13 +762,13 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                             {props.permissionMode && (
                                 <Text style={{
                                     fontSize: 11,
-                                    color: props.permissionMode === 'acceptEdits' ? theme.colors.permission.acceptEdits :
+                                    color: props.permissionMode === 'acceptEdits' || props.permissionMode === 'auto_edit' ? theme.colors.permission.acceptEdits :
                                         props.permissionMode === 'bypassPermissions' ? theme.colors.permission.bypass :
                                             props.permissionMode === 'plan' ? theme.colors.permission.plan :
                                                 props.permissionMode === 'read-only' ? theme.colors.permission.readOnly :
                                                     props.permissionMode === 'safe-yolo' ? theme.colors.permission.safeYolo :
                                                         props.permissionMode === 'yolo' ? theme.colors.permission.yolo :
-                                                            theme.colors.textSecondary, // Use secondary text color for default
+                                                            theme.colors.textSecondary,
                                     ...Typography.default()
                                 }}>
                                     {isCodex ? (
@@ -747,6 +776,10 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                                             props.permissionMode === 'read-only' ? t('agentInput.codexPermissionMode.badgeReadOnly') :
                                                 props.permissionMode === 'safe-yolo' ? t('agentInput.codexPermissionMode.badgeSafeYolo') :
                                                     props.permissionMode === 'yolo' ? t('agentInput.codexPermissionMode.badgeYolo') : ''
+                                    ) : isGemini ? (
+                                        props.permissionMode === 'default' ? t('agentInput.geminiPermissionMode.default') :
+                                            props.permissionMode === 'auto_edit' ? t('agentInput.geminiPermissionMode.badgeAutoEdit') :
+                                                props.permissionMode === 'yolo' ? t('agentInput.geminiPermissionMode.badgeYolo') : ''
                                     ) : (
                                         props.permissionMode === 'default' ? t('agentInput.permissionMode.default') :
                                             props.permissionMode === 'acceptEdits' ? t('agentInput.permissionMode.badgeAcceptAllEdits') :
@@ -834,7 +867,13 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                                         fontWeight: '600',
                                         ...Typography.default('semiBold'),
                                     }}>
-                                        {props.agentType === 'claude' ? t('agentInput.agent.claude') : t('agentInput.agent.codex')}
+                                        {props.agentType === 'claude'
+                                            ? t('agentInput.agent.claude')
+                                            : props.agentType === 'codex'
+                                                ? t('agentInput.agent.codex')
+                                                : props.agentType === 'gemini'
+                                                    ? t('agentInput.agent.gemini')
+                                                    : t('agentInput.agent.claude')}
                                     </Text>
                                 </Pressable>
                             )}

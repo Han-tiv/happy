@@ -14,7 +14,7 @@ interface SessionPermissionRequest {
     id: string;
     approved: boolean;
     reason?: string;
-    mode?: 'default' | 'acceptEdits' | 'bypassPermissions' | 'plan';
+    mode?: 'default' | 'acceptEdits' | 'bypassPermissions' | 'plan' | 'auto_edit';
     allowTools?: string[];
     decision?: 'approved' | 'approved_for_session' | 'denied' | 'abort';
 }
@@ -299,7 +299,7 @@ export async function sessionAbort(sessionId: string): Promise<void> {
 /**
  * Allow a permission request
  */
-export async function sessionAllow(sessionId: string, id: string, mode?: 'default' | 'acceptEdits' | 'bypassPermissions' | 'plan', allowedTools?: string[], decision?: 'approved' | 'approved_for_session'): Promise<void> {
+export async function sessionAllow(sessionId: string, id: string, mode?: 'default' | 'acceptEdits' | 'bypassPermissions' | 'plan' | 'auto_edit', allowedTools?: string[], decision?: 'approved' | 'approved_for_session'): Promise<void> {
     const request: SessionPermissionRequest = { id, approved: true, mode, allowTools: allowedTools, decision };
     await apiSocket.sessionRPC(sessionId, 'permission', request);
 }
@@ -307,7 +307,7 @@ export async function sessionAllow(sessionId: string, id: string, mode?: 'defaul
 /**
  * Deny a permission request
  */
-export async function sessionDeny(sessionId: string, id: string, mode?: 'default' | 'acceptEdits' | 'bypassPermissions' | 'plan', allowedTools?: string[], decision?: 'denied' | 'abort'): Promise<void> {
+export async function sessionDeny(sessionId: string, id: string, mode?: 'default' | 'acceptEdits' | 'bypassPermissions' | 'plan' | 'auto_edit', allowedTools?: string[], decision?: 'denied' | 'abort'): Promise<void> {
     const request: SessionPermissionRequest = { id, approved: false, mode, allowTools: allowedTools, decision };
     await apiSocket.sessionRPC(sessionId, 'permission', request);
 }

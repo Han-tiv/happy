@@ -1,17 +1,42 @@
 import React from 'react';
 import { Text, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Typography } from '@/constants/Typography';
 import { hapticsLight } from './haptics';
+import { Typography } from '@/constants/Typography';
 
-export type PermissionMode = 'default' | 'acceptEdits' | 'bypassPermissions' | 'plan' | 'read-only' | 'safe-yolo' | 'yolo';
+export type PermissionMode =
+    | 'default'
+    | 'acceptEdits'
+    | 'bypassPermissions'
+    | 'plan'
+    | 'read-only'
+    | 'safe-yolo'
+    | 'yolo'
+    | 'auto_edit';
 
-export type ModelMode = 'default' | 'adaptiveUsage' | 'sonnet' | 'opus' | 'gpt-5-minimal' | 'gpt-5-low' | 'gpt-5-medium' | 'gpt-5-high' | 'gpt-5-codex-low' | 'gpt-5-codex-medium' | 'gpt-5-codex-high';
+export type ModelMode =
+    | 'default'
+    | 'adaptiveUsage'
+    | 'sonnet'
+    | 'opus'
+    | 'gpt-5-minimal'
+    | 'gpt-5-low'
+    | 'gpt-5-medium'
+    | 'gpt-5-high'
+    | 'gpt-5-codex-low'
+    | 'gpt-5-codex-medium'
+    | 'gpt-5-codex-high'
+    | 'gemini-2.0-flash'
+    | 'gemini-2.0-flash-thinking'
+    | 'gemini-2.0-pro';
+
+type PermissionVariant = 'claude' | 'codex' | 'gemini';
 
 interface PermissionModeSelectorProps {
     mode: PermissionMode;
     onModeChange: (mode: PermissionMode) => void;
     disabled?: boolean;
+    variant?: PermissionVariant;
 }
 
 const modeConfig = {
@@ -46,27 +71,39 @@ const modeConfig = {
         icon: 'shield' as const,
         description: 'Safe YOLO mode'
     },
-    'yolo': {
+    yolo: {
         label: 'YOLO',
         icon: 'rocket' as const,
         description: 'YOLO mode'
     },
+    auto_edit: {
+        label: 'Auto Edit',
+        icon: 'create' as const,
+        description: 'Auto-approve Gemini edit tools'
+    },
 };
 
-const modeOrder: PermissionMode[] = ['default', 'acceptEdits', 'plan', 'bypassPermissions'];
+const modeOrderMap: Record<PermissionVariant, PermissionMode[]> = {
+    claude: ['default', 'acceptEdits', 'plan', 'bypassPermissions'],
+    codex: ['default', 'read-only', 'safe-yolo', 'yolo'],
+    gemini: ['default', 'auto_edit', 'yolo']
+};
 
 export const PermissionModeSelector: React.FC<PermissionModeSelectorProps> = ({
     mode,
     onModeChange,
-    disabled = false
+    disabled = false,
+    variant = 'claude'
 }) => {
-    const currentConfig = modeConfig[mode];
+    const supportedModes = modeOrderMap[variant] ?? modeOrderMap.claude;
+    const safeMode = supportedModes.includes(mode) ? mode : 'default';
+    const currentConfig = modeConfig[safeMode];
 
     const handleTap = () => {
         hapticsLight();
-        const currentIndex = modeOrder.indexOf(mode);
-        const nextIndex = (currentIndex + 1) % modeOrder.length;
-        onModeChange(modeOrder[nextIndex]);
+        const currentIndex = supportedModes.indexOf(safeMode);
+        const nextIndex = (currentIndex + 1) % supportedModes.length;
+        onModeChange(supportedModes[nextIndex]);
     };
 
     return (

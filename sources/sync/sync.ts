@@ -265,6 +265,19 @@ class Sync {
                 model = 'claude-opus-4-1-20250805';
                 fallbackModel = null;
                 break;
+            case 'gpt-5-minimal':
+            case 'gpt-5-low':
+            case 'gpt-5-medium':
+            case 'gpt-5-high':
+            case 'gpt-5-codex-low':
+            case 'gpt-5-codex-medium':
+            case 'gpt-5-codex-high':
+            case 'gemini-2.0-flash':
+            case 'gemini-2.0-flash-thinking':
+            case 'gemini-2.0-pro':
+                model = modelMode;
+                fallbackModel = null;
+                break;
             default:
                 // If no modelMode is specified, use default behavior (let server decide)
                 model = null;

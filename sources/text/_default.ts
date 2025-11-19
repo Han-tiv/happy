@@ -389,6 +389,7 @@ export const en = {
         agent: {
             claude: 'Claude',
             codex: 'Codex',
+            gemini: 'Gemini',
         },
         model: {
             title: 'MODEL',
@@ -407,6 +408,14 @@ export const en = {
             badgeSafeYolo: 'Safe YOLO',
             badgeYolo: 'YOLO',
         },
+        geminiPermissionMode: {
+            title: 'GEMINI PERMISSION MODE',
+            default: 'Default (Prompt for approval)',
+            autoEdit: 'Auto Edit (Auto-approve edit tools)',
+            yolo: 'YOLO (Auto-approve all tools)',
+            badgeAutoEdit: 'Auto Edit (Auto-approve edit tools)',
+            badgeYolo: 'YOLO (Auto-approve all tools)',
+        },
         codexModel: {
             title: 'CODEX MODEL',
             gpt5CodexLow: 'gpt-5-codex low',
@@ -416,6 +425,13 @@ export const en = {
             gpt5Low: 'GPT-5 Low',
             gpt5Medium: 'GPT-5 Medium',
             gpt5High: 'GPT-5 High',
+        },
+        geminiModel: {
+            title: 'GEMINI MODEL',
+            default: 'Gemini CLI default',
+            flash: 'gemini-2.0-flash',
+            flashThinking: 'gemini-2.0-flash-thinking',
+            pro: 'gemini-2.0-pro',
         },
         context: {
             remaining: ({ percent }: { percent: number }) => `${percent}% left`,
