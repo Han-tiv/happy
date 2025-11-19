@@ -11,7 +11,8 @@
       "channel": "development",
       "env": {
         "APP_ENV": "development"
-      }
+      },
+      "credentialsSource": "remote"
     },
     "development-store": {
       "autoIncrement": true,
