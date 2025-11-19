@@ -54,7 +54,7 @@ export default {
             ],
             edgeToEdgeEnabled: true,
             package: bundleId,
-            googleServicesFile: "./google-services.json",
+            // googleServicesFile: "./google-services.json", // Temporarily disabled - package name mismatch
             intentFilters: variant === 'production' ? [
                 {
                     "action": "VIEW",
