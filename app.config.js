@@ -83,6 +83,19 @@ export default {
                     root: "./sources/app"
                 }
             ],
+            [
+                "expo-build-properties",
+                {
+                    android: {
+                        kotlinVersion: "2.1.20",
+                        gradleVersion: "8.11.1",
+                        compileSdkVersion: 36,
+                        targetSdkVersion: 36,
+                        minSdkVersion: 26,
+                        buildToolsVersion: "36.0.0"
+                    }
+                }
+            ],
             "expo-updates",
             "expo-asset",
             "expo-localization",
