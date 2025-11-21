@@ -20,7 +20,7 @@ export default {
         icon: "./sources/assets/images/icon.png",
         scheme: "happy",
         userInterfaceStyle: "automatic",
-        newArchEnabled: true,
+        newArchEnabled: false,  // Temporarily disabled to fix build
         notification: {
             icon: "./sources/assets/images/icon-notification.png",
             iosDisplayInForeground: true
@@ -81,18 +81,6 @@ export default {
                 "expo-router",
                 {
                     root: "./sources/app"
-                }
-            ],
-            [
-                "expo-build-properties",
-                {
-                    android: {
-                        compileSdkVersion: 35,
-                        targetSdkVersion: 35,
-                        minSdkVersion: 23,
-                        buildToolsVersion: "35.0.0",
-                        kotlinVersion: "2.0.21"
-                    }
                 }
             ],
             "expo-updates",
